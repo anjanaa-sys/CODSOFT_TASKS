@@ -1,0 +1,479 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --background: #07110d;
+  --surface: #0d1b15;
+  --surface-light: #11271c;
+  --text: #f3faf5;
+  --muted: #9cafA3;
+  --accent: #63f59a;
+  --line: rgba(255,255,255,.11);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(99,245,154,.12), transparent 28%),
+    var(--background);
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.header {
+  width: min(1180px, 92%);
+  height: 78px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line);
+}
+
+.logo,
+.footer-logo {
+  font: 700 1.25rem "Space Grotesk", sans-serif;
+  letter-spacing: .08em;
+}
+
+.logo span,
+.footer-logo span,
+h1 span {
+  color: var(--accent);
+}
+
+nav {
+  display: flex;
+  gap: 32px;
+}
+
+nav a {
+  color: var(--muted);
+  font-size: .9rem;
+  transition: .2s;
+}
+
+nav a:hover {
+  color: var(--accent);
+}
+
+.nav-button,
+.primary-button {
+  display: inline-block;
+  padding: 11px 19px;
+  background: var(--accent);
+  color: #06100b;
+  border-radius: 6px;
+  font-weight: 700;
+  transition: .2s;
+}
+
+.nav-button:hover,
+.primary-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(99,245,154,.16);
+}
+
+.hero {
+  width: min(1180px, 92%);
+  min-height: 650px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  align-items: center;
+  gap: 60px;
+}
+
+.tag {
+  color: var(--accent);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .18em;
+}
+
+.hero h1 {
+  max-width: 760px;
+  margin: 18px 0 25px;
+  font: 700 clamp(3.3rem, 7vw, 6.2rem)/.98 "Space Grotesk", sans-serif;
+  letter-spacing: -.06em;
+}
+
+.hero-text {
+  max-width: 590px;
+  color: var(--muted);
+  font-size: 1.08rem;
+}
+
+.buttons {
+  display: flex;
+  gap: 14px;
+  margin-top: 32px;
+  align-items: center;
+}
+
+.secondary-button {
+  padding: 10px 18px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.hero-visual {
+  min-height: 410px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  background: linear-gradient(145deg, #11291d, #07110d);
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(1px);
+}
+
+.circle-one {
+  width: 280px;
+  height: 280px;
+  top: 35px;
+  right: -55px;
+  background: radial-gradient(circle at 35% 35%, #c3ffd8, #39d979 38%, #0d3823 70%);
+}
+
+.circle-two {
+  width: 180px;
+  height: 180px;
+  bottom: -65px;
+  left: -40px;
+  background: radial-gradient(circle, rgba(99,245,154,.5), transparent 70%);
+}
+
+.visual-card {
+  position: absolute;
+  left: 35px;
+  bottom: 35px;
+  width: 230px;
+  padding: 22px;
+  background: rgba(7,17,13,.86);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+.visual-card span,
+.visual-card small {
+  display: block;
+  color: var(--muted);
+  font-size: .7rem;
+}
+
+.visual-card strong {
+  display: block;
+  margin: 8px 0;
+  font: 700 2.4rem "Space Grotesk";
+}
+
+.progress {
+  height: 5px;
+  margin-top: 15px;
+  background: #203229;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.progress div {
+  width: 98.7%;
+  height: 100%;
+  background: var(--accent);
+}
+
+.numbers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.numbers div {
+  padding: 28px 8%;
+  border-right: 1px solid var(--line);
+}
+
+.numbers div:last-child {
+  border-right: 0;
+}
+
+.numbers strong,
+.numbers span {
+  display: block;
+}
+
+.numbers strong {
+  color: var(--accent);
+  font: 700 1.5rem "Space Grotesk";
+}
+
+.numbers span {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: .82rem;
+}
+
+.section {
+  width: min(1180px, 92%);
+  margin: auto;
+  padding: 120px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.section-heading {
+  max-width: 720px;
+  margin-bottom: 45px;
+}
+
+.section h2,
+.about h2,
+.contact h2 {
+  margin-top: 15px;
+  font: 600 clamp(2.4rem, 5vw, 4.3rem)/1.05 "Space Grotesk";
+  letter-spacing: -.05em;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.card {
+  min-height: 260px;
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  transition: .25s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(99,245,154,.4);
+}
+
+.icon {
+  color: var(--accent);
+  font-size: .75rem;
+  letter-spacing: .15em;
+}
+
+.card h3 {
+  margin: 50px 0 12px;
+  font: 600 1.4rem "Space Grotesk";
+}
+
+.card p,
+.about-content p,
+.why-grid p,
+.contact > p {
+  color: var(--muted);
+}
+
+.about {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.about-visual {
+  min-height: 420px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+}
+
+.grid-pattern {
+  position: absolute;
+  inset: 0;
+  opacity: .45;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 45px 45px;
+}
+
+.about-box {
+  position: absolute;
+  left: 35px;
+  bottom: 35px;
+  padding: 25px;
+  background: var(--surface-light);
+  border: 1px solid var(--line);
+}
+
+.about-box span {
+  color: var(--accent);
+  font-size: .7rem;
+}
+
+.about-box strong {
+  display: block;
+  margin-top: 12px;
+  font: 700 2rem/1.05 "Space Grotesk";
+}
+
+.about-content h2 {
+  margin-bottom: 28px;
+}
+
+.about-content p {
+  margin-bottom: 18px;
+}
+
+.text-link {
+  display: inline-block;
+  margin-top: 12px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.why-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.why-grid > div {
+  padding: 30px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.why-grid strong {
+  color: var(--accent);
+  font-size: .75rem;
+}
+
+.why-grid h3 {
+  margin: 30px 0 10px;
+  font: 600 1.5rem "Space Grotesk";
+}
+
+.contact {
+  width: min(900px, 92%);
+  margin: auto;
+  padding: 130px 0;
+  text-align: center;
+}
+
+.contact h2 {
+  margin-bottom: 20px;
+}
+
+.contact .primary-button {
+  margin-top: 30px;
+}
+
+footer {
+  width: min(1180px, 92%);
+  margin: auto;
+  padding: 25px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: .78rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 22px;
+}
+
+.footer-links a:hover {
+  color: var(--accent);
+}
+
+@media (max-width: 800px) {
+  nav {
+    display: none;
+  }
+
+  .nav-button {
+    padding: 8px 12px;
+    font-size: .8rem;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+    padding: 80px 0;
+  }
+
+  .hero-visual {
+    min-height: 330px;
+  }
+
+  .numbers {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .numbers div:nth-child(2) {
+    border-right: 0;
+  }
+
+  .section {
+    padding: 80px 0;
+  }
+
+  .cards,
+  .about,
+  .why-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .about {
+    gap: 40px;
+  }
+
+  footer {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .hero h1 {
+    font-size: 3.2rem;
+  }
+
+  .buttons {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .hero-visual {
+    min-height: 300px;
+  }
+
+  .visual-card {
+    left: 20px;
+    bottom: 20px;
+  }
+}
