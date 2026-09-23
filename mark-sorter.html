@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mark Sorter Pro — Interactive Algorithm Workbench</title>
+  <meta name="description" content="Interactive algorithm workbench and telemetry engine for sorting student marks, built with Web Audio synthesis and multi-language logic walkthroughs." />
+  <meta name="theme-color" content="#090d16" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>" />
+
+  <!-- Google Fonts & Font Awesome 6 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #090d16;
+      --surface: #101626;
+      --surface2: #172036;
+      --surface3: #1f2b48;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.3);
+
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --dim: #64748b;
+
+      --accent: #38bdf8;
+      --accent-purple: #a855f7;
+      --col-unsorted: #38bdf8;
+      --col-compare: #f59e0b;
+      --col-min: #ef4444;
+      --col-swap: #c084fc;
+      --col-sorted: #10b981;
+      --col-pivot: #ec4899;
+
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 0 1rem 3rem;
+      overflow-x: hidden;
+    }
+
+    /* Top Navigation Bar */
+    .top-nav {
+      max-width: 1120px;
+      width: 100%;
+      margin: 1.25rem auto 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(12px);
+    }
+    .nav-left-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      transition: transform 0.2s, color 0.2s;
+    }
+    .back-btn:hover {
+      transform: translateX(-3px);
+      color: #7dd3fc;
+    }
+    .nav-pill-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 500;
+      padding: 5px 12px;
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      transition: all 0.2s;
+    }
+    .nav-pill-link:hover {
+      color: var(--accent);
+      border-color: var(--border-accent);
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .icon-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .icon-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .icon-btn.active {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Main Container */
+    .app-container {
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Header */
+    .header-banner {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 14px;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .header-banner h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .header-banner p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    /* Algorithm Selector Toolbar */
+    .algo-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.25rem;
+    }
+    .algo-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .algo-tab {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .algo-tab:hover {
+      color: var(--text);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    .algo-tab.active {
+      background: var(--accent);
+      color: #080d1a;
+      border-color: var(--accent);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+    }
+
+    .algo-meta-tags {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .meta-tag {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+    }
+
+    /* Input & Preset Controls */
+    .controls-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 1.25rem;
+      align-items: end;
+    }
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .input-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    label {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .presets-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .preset-btn {
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .preset-btn:hover { background: var(--accent); color: #000; }
+
+    input[type="text"] {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.95rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 100%;
+    }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    /* Sliders & Secondary Controls */
+    .speed-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .slider-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: var(--surface2);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+
+    /* Action Buttons Row */
+    .action-btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 1.25rem;
+    }
+    .action-left {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+    .action-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.88rem;
+      font-weight: 600;
+      padding: 10px 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s, opacity 0.15s, background 0.2s;
+    }
+    .btn:hover:not(:disabled) { transform: translateY(-2px); }
+    .btn:active:not(:disabled) { transform: translateY(0); }
+    .btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .btn-play { background: var(--accent); color: #080d1a; box-shadow: 0 4px 14px rgba(56, 189, 248, 0.3); }
+    .btn-step { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-step:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+    .btn-reset { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+    .btn-reset:hover:not(:disabled) { border-color: #ef4444; color: #ef4444; }
+
+    .btn-toggle-dir {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      font-size: 0.82rem;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-toggle-dir:hover {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.12);
+    }
+
+    #error-msg {
+      color: #f87171;
+      font-size: 0.82rem;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+
+    /* Progress Bar */
+    .progress-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 1rem;
+    }
+    .progress-track {
+      flex: 1;
+      height: 6px;
+      background: var(--surface2);
+      border-radius: 9999px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #38bdf8, #10b981);
+      border-radius: 9999px;
+      transition: width 0.15s ease;
+    }
+    .step-counter-text {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Legend Bar */
+    .legend-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 0.85rem 1.25rem;
+      background: var(--surface2);
+      border-radius: var(--radius-md);
+      margin-bottom: 1.25rem;
+      border: 1px solid var(--border);
+    }
+    .legend-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .view-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--surface);
+      padding: 3px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+    .view-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 5px 11px;
+      border-radius: 4px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s;
+    }
+    .view-btn.active {
+      background: var(--surface2);
+      color: var(--accent);
+    }
+
+    /* ================= VISUALIZATION CANVAS ================= */
+    #viz-stage {
+      min-height: 290px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 24px 18px 18px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      gap: 8px;
+      position: relative;
+      overflow-x: auto;
+      box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Vertical Bar Elements */
+    .bar-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      min-width: 28px;
+      max-width: 48px;
+      height: 100%;
+      justify-content: flex-end;
+      transition: transform 0.2s ease;
+    }
+    .bar-mark-val {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 6px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    }
+    .bar-pillar {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      background: var(--col-unsorted);
+      transition: height 0.2s ease, background-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+      min-height: 14px;
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .bar-idx {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      color: var(--dim);
+      margin-top: 6px;
+    }
+
+    /* Student Grade Cards View */
+    .cards-view-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      min-height: 240px;
+      padding: 10px 0;
+    }
+    .student-card {
+      width: 110px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 8px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.22s ease;
+      position: relative;
+    }
+    .student-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surface2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .student-mark {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .student-grade-badge {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .grade-A { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    .grade-B { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .grade-C { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .grade-F { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+
+    /* Telemetry Info Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 1.25rem;
+    }
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 14px 16px;
+    }
+    .stat-lbl {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+    .stat-val {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    /* Dual Panels: Code Walkthrough & Narration Log */
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 1.25rem;
+    }
+
+    .panel-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      font-size: 0.84rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .lang-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--surface2);
+      padding: 2px;
+      border-radius: 4px;
+    }
+    .lang-btn {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.72rem;
+      padding: 3px 8px;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.15s;
+    }
+    .lang-btn.active {
+      background: var(--surface3);
+      color: var(--accent);
+    }
+
+    /* Code Block */
+    .code-viewer {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.8rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      max-height: 250px;
+    }
+    .code-line {
+      display: block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: background 0.15s;
+      color: var(--muted);
+      white-space: pre;
+    }
+    .code-line.active {
+      background: rgba(56, 189, 248, 0.22);
+      color: #38bdf8;
+      font-weight: 600;
+      border-left: 3px solid var(--accent);
+    }
+
+    /* Step Log */
+    #step-log {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      max-height: 250px;
+      overflow-y: auto;
+      font-size: 0.82rem;
+      line-height: 1.8;
+      color: var(--muted);
+      display: flex;
+      flex-direction: column-reverse;
+    }
+    .log-entry {
+      padding: 3px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .log-entry.hl {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .log-entry i { margin-right: 6px; }
+
+    @media (max-width: 860px) {
+      .controls-grid { grid-template-columns: 1fr; }
+      .details-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation -->
+  <nav class="top-nav">
+    <div class="nav-left-links">
+      <a href="index.html" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Back to Portfolio
+      </a>
+      <a href="skyline.html" class="nav-pill-link">
+        <i class="fas fa-cloud-sun"></i> Skyline Weather
+      </a>
+    </div>
+
+    <div class="nav-actions">
+      <button id="copyMarksBtn" class="icon-btn" title="Copy current marks to clipboard">
+        <i class="fas fa-copy"></i> <span>Copy Marks</span>
+      </button>
+      <button id="soundToggle" class="icon-btn active" title="Toggle audio feedback">
+        <i class="fas fa-volume-high"></i> <span>Audio: ON</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="app-container">
+    <!-- Header Banner -->
+    <header class="header-banner">
+      <div class="header-badge"><i class="fas fa-microchip"></i> Algorithm Workbench</div>
+      <h1>MARK SORTER PRO</h1>
+      <p>Interactive Algorithm Workbench &amp; Telemetry Engine for Student Marks</p>
+    </header>
+
+    <!-- Main Workspace Card -->
+    <div class="card">
+      <!-- Algorithm Selection Toolbar -->
+      <div class="algo-toolbar">
+        <div class="algo-tabs" id="algoTabs">
+          <button class="algo-tab active" data-algo="selection">Selection Sort</button>
+          <button class="algo-tab" data-algo="bubble">Bubble Sort</button>
+          <button class="algo-tab" data-algo="insertion">Insertion Sort</button>
+          <button class="algo-tab" data-algo="quick">Quick Sort</button>
+          <button class="algo-tab" data-algo="merge">Merge Sort</button>
+        </div>
+
+        <div class="algo-meta-tags">
+          <span class="meta-tag" id="timeComplexity">Time: O(n²)</span>
+          <span class="meta-tag" id="spaceComplexity">Space: O(1)</span>
+          <span class="meta-tag" id="stabilityTag">Unstable</span>
+        </div>
+      </div>
+
+      <!-- Controls Grid -->
+      <div class="controls-grid">
+        <div class="input-group">
+          <div class="input-label-row">
+            <label for="numInput">Student Marks (0–100, comma-separated)</label>
+            <div class="presets-row">
+              <button class="preset-btn" data-preset="marks">Exam Marks</button>
+              <button class="preset-btn" data-preset="random">Random 10</button>
+              <button class="preset-btn" data-preset="nearly">Nearly Sorted</button>
+              <button class="preset-btn" data-preset="reverse">Reversed</button>
+            </div>
+          </div>
+          <input type="text" id="numInput" value="85, 42, 91, 67, 54, 78, 99, 33, 88, 62" />
+        </div>
+
+        <div class="speed-group">
+          <div class="input-label-row">
+            <label for="speedSlider">Engine Speed</label>
+            <span id="speedLabel" style="font-size:0.75rem; color:var(--accent); font-weight:600;">Medium (200ms)</span>
+          </div>
+          <div class="slider-row">
+            <input type="range" id="speedSlider" min="1" max="5" value="3" step="1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Row -->
+      <div class="action-btn-row">
+        <div class="action-left">
+          <button class="btn btn-play" id="btnPlay"><i class="fas fa-play"></i> Play</button>
+          <button class="btn btn-step" id="btnStep"><i class="fas fa-forward-step"></i> Step</button>
+          <button class="btn btn-reset" id="btnReset"><i class="fas fa-rotate-left"></i> Reset</button>
+        </div>
+
+        <div class="action-right">
+          <button class="btn-toggle-dir" id="btnToggleDir" title="Switch between Ascending and Descending (Rank Order)">
+            <i class="fas fa-arrow-down-short-wide"></i> <span>Ascending (0 → 100)</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="error-msg"></div>
+    </div>
+
+    <!-- Visualizer Canvas Card -->
+    <div class="card">
+      <!-- Progress Bar & Step Counter -->
+      <div class="progress-container">
+        <div class="progress-track">
+          <div class="progress-fill" id="progressBar"></div>
+        </div>
+        <span class="step-counter-text" id="stepCounter">Step 0 / 0</span>
+      </div>
+
+      <div class="legend-bar">
+        <div class="legend-items">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-unsorted)"></div> Unsorted</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-compare)"></div> Comparing</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-min)"></div> Target / Min</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-pivot)"></div> Pivot</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-swap)"></div> Placing / Swap</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--col-sorted)"></div> Sorted</div>
+        </div>
+
+        <div class="view-toggle">
+          <button class="view-btn active" id="viewBarsBtn"><i class="fas fa-chart-column"></i> Height Bars</button>
+          <button class="view-btn" id="viewCardsBtn"><i class="fas fa-id-card"></i> Student Cards</button>
+        </div>
+      </div>
+
+      <!-- Interactive Canvas Stage -->
+      <div id="viz-stage"></div>
+
+      <!-- Telemetry Info Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-lbl">Pass / Depth</div>
+          <div class="stat-val" id="statPass">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Comparisons</div>
+          <div class="stat-val" id="statComps">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">Swaps / Writes</div>
+          <div class="stat-val" id="statSwaps">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-lbl">System State</div>
+          <div class="stat-val" id="statStatus" style="font-size:1.1rem; line-height:1.4; color:var(--accent);">Ready</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Details Grid: Code Inspector & Step Narration -->
+    <div class="details-grid">
+      <!-- Code Viewer -->
+      <div class="panel-box">
+        <div class="panel-title">
+          <span><i class="fas fa-code"></i> Algorithm Logic Walkthrough</span>
+          <div class="lang-tabs" id="langTabs">
+            <button class="lang-btn active" data-lang="python">Python</button>
+            <button class="lang-btn" data-lang="c">C</button>
+            <button class="lang-btn" data-lang="cpp">C++</button>
+          </div>
+        </div>
+        <div class="code-viewer" id="codeViewer"></div>
+      </div>
+
+      <!-- Live Step Narration Log -->
+      <div class="panel-box">
+        <div class="panel-title">
+          <span><i class="fas fa-terminal"></i> Step-by-Step Narration</span>
+        </div>
+        <div id="step-log">
+          <div class="log-entry">Algorithm workbench initialized and ready.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       MARK SORTER PRO ENGINE
+       Multi-Algorithm Generation, Audio Synthesizer, Dual Visualizer, Dual Direction
+       ========================================================================== */
+
+    const ALGO_METADATA = {
+      selection: {
+        name: 'Selection Sort',
+        time: 'Time: O(n²)',
+        space: 'Space: O(1)',
+        stability: 'Unstable',
+        code: {
+          python: [
+            'def selection_sort(marks):',
+            '    n = len(marks)',
+            '    for i in range(n - 1):',
+            '        min_idx = i',
+            '        for j in range(i + 1, n):',
+            '            if marks[j] < marks[min_idx]:',
+            '                min_idx = j',
+            '        marks[i], marks[min_idx] = marks[min_idx], marks[i]'
+          ],
+          c: [
+            'void selectionSort(int marks[], int n) {',
+            '    for (int i = 0; i < n - 1; i++) {',
+            '        int min_idx = i;',
+            '        for (int j = i + 1; j < n; j++) {',
+            '            if (marks[j] < marks[min_idx])',
+            '                min_idx = j;',
+            '        }',
+            '        int temp = marks[i]; marks[i] = marks[min_idx]; marks[min_idx] = temp;',
+            '    }',
+            '}'
+          ],
+          cpp: [
+            'void selectionSort(std::vector<int>& marks) {',
+            '    int n = marks.size();',
+            '    for (int i = 0; i < n - 1; ++i) {',
+            '        int min_idx = i;',
+            '        for (int j = i + 1; j < n; ++j) {',
+            '            if (marks[j] < marks[min_idx]) min_idx = j;',
+            '        }',
+            '        std::swap(marks[i], marks[min_idx]);',
+            '    }',
+            '}'
+          ]
+        }
+      },
+      bubble: {
+        name: 'Bubble Sort',
+        time: 'Time: O(n²)',
+        space: 'Space: O(1)',
+        stability: 'Stable',
+        code: {
+          python: [
+            'def bubble_sort(marks):',
+            '    n = len(marks)',
+            '    for i in range(n):',
+            '        for j in range(0, n - i - 1):',
+            '            if marks[j] > marks[j + 1]:',
+            '                marks[j], marks[j+1] = marks[j+1], marks[j]'
+          ],
+          c: [
+            'void bubbleSort(int marks[], int n) {',
+            '    for (int i = 0; i < n - 1; i++) {',
+            '        for (int j = 0; j < n - i - 1; j++) {',
+            '            if (marks[j] > marks[j + 1]) {',
+            '                int t = marks[j]; marks[j] = marks[j+1]; marks[j+1] = t;',
+            '            }',
+            '        }',
+            '    }',
+            '}'
+          ],
+          cpp: [
+            'void bubbleSort(std::vector<int>& marks) {',
+            '    int n = marks.size();',
+            '    for (int i = 0; i < n - 1; ++i) {',
+            '        for (int j = 0; j < n - i - 1; ++j) {',
+            '            if (marks[j] > marks[j + 1]) std::swap(marks[j], marks[j + 1]);',
+            '        }',
+            '    }',
+            '}'
+          ]
+        }
+      },
+      insertion: {
+        name: 'Insertion Sort',
+        time: 'Time: O(n²)',
+        space: 'Space: O(1)',
+        stability: 'Stable',
+        code: {
+          python: [
+            'def insertion_sort(marks):',
+            '    for i in range(1, len(marks)):',
+            '        key = marks[i]',
+            '        j = i - 1',
+            '        while j >= 0 and marks[j] > key:',
+            '            marks[j + 1] = marks[j]',
+            '            j -= 1',
+            '        marks[j + 1] = key'
+          ],
+          c: [
+            'void insertionSort(int marks[], int n) {',
+            '    for (int i = 1; i < n; i++) {',
+            '        int key = marks[i]; int j = i - 1;',
+            '        while (j >= 0 && marks[j] > key) {',
+            '            marks[j + 1] = marks[j]; j--;',
+            '        }',
+            '        marks[j + 1] = key;',
+            '    }',
+            '}'
+          ],
+          cpp: [
+            'void insertionSort(std::vector<int>& marks) {',
+            '    for (size_t i = 1; i < marks.size(); ++i) {',
+            '        int key = marks[i]; int j = i - 1;',
+            '        while (j >= 0 && marks[j] > key) {',
+            '            marks[j + 1] = marks[j]; --j;',
+            '        }',
+            '        marks[j + 1] = key;',
+            '    }',
+            '}'
+          ]
+        }
+      },
+      quick: {
+        name: 'Quick Sort',
+        time: 'Time: O(n log n)',
+        space: 'Space: O(log n)',
+        stability: 'Unstable',
+        code: {
+          python: [
+            'def quick_sort(marks, low, high):',
+            '    if low < high:',
+            '        pi = partition(marks, low, high)',
+            '        quick_sort(marks, low, pi - 1)',
+            '        quick_sort(marks, pi + 1, high)',
+            'def partition(marks, low, high):',
+            '    pivot = marks[high]',
+            '    i = low - 1',
+            '    for j in range(low, high):',
+            '        if marks[j] < pivot:',
+            '            i += 1; marks[i], marks[j] = marks[j], marks[i]',
+            '    marks[i + 1], marks[high] = marks[high], marks[i + 1]',
+            '    return i + 1'
+          ],
+          c: [
+            'int partition(int a[], int low, int high) {',
+            '    int pivot = a[high], i = low - 1;',
+            '    for (int j = low; j < high; j++) {',
+            '        if (a[j] < pivot) { i++; int t=a[i]; a[i]=a[j]; a[j]=t; }',
+            '    }',
+            '    int t=a[i+1]; a[i+1]=a[high]; a[high]=t; return i+1;',
+            '}',
+            'void quickSort(int a[], int low, int high) {',
+            '    if (low < high) {',
+            '        int pi = partition(a, low, high);',
+            '        quickSort(a, low, pi - 1); quickSort(a, pi + 1, high);',
+            '    }',
+            '}'
+          ],
+          cpp: [
+            'int partition(std::vector<int>& a, int low, int high) {',
+            '    int pivot = a[high], i = low - 1;',
+            '    for (int j = low; j < high; ++j) {',
+            '        if (a[j] < pivot) std::swap(a[++i], a[j]);',
+            '    }',
+            '    std::swap(a[i + 1], a[high]); return i + 1;',
+            '}',
+            'void quickSort(std::vector<int>& a, int low, int high) {',
+            '    if (low < high) {',
+            '        int pi = partition(a, low, high);',
+            '        quickSort(a, low, pi - 1); quickSort(a, pi + 1, high);',
+            '    }',
+            '}'
+          ]
+        }
+      },
+      merge: {
+        name: 'Merge Sort',
+        time: 'Time: O(n log n)',
+        space: 'Space: O(n)',
+        stability: 'Stable',
+        code: {
+          python: [
+            'def merge_sort(marks):',
+            '    if len(marks) > 1:',
+            '        mid = len(marks) // 2',
+            '        L = marks[:mid]; R = marks[mid:]',
+            '        merge_sort(L); merge_sort(R)',
+            '        i = j = k = 0',
+            '        while i < len(L) and j < len(R):',
+            '            if L[i] <= R[j]: marks[k] = L[i]; i += 1',
+            '            else: marks[k] = R[j]; j += 1',
+            '            k += 1',
+            '        while i < len(L): marks[k] = L[i]; i += 1; k += 1',
+            '        while j < len(R): marks[k] = R[j]; j += 1; k += 1'
+          ],
+          c: [
+            'void merge(int a[], int l, int m, int r) {',
+            '    int n1 = m - l + 1, n2 = r - m;',
+            '    int L[n1], R[n2];',
+            '    for (int i=0; i<n1; i++) L[i] = a[l + i];',
+            '    for (int j=0; j<n2; j++) R[j] = a[m + 1 + j];',
+            '    int i=0, j=0, k=l;',
+            '    while (i<n1 && j<n2) { if (L[i]<=R[j]) a[k++]=L[i++]; else a[k++]=R[j++]; }',
+            '    while (i<n1) a[k++]=L[i++]; while (j<n2) a[k++]=R[j++];',
+            '}',
+            'void mergeSort(int a[], int l, int r) {',
+            '    if (l < r) { int m = l+(r-l)/2; mergeSort(a,l,m); mergeSort(a,m+1,r); merge(a,l,m,r); }',
+            '}'
+          ],
+          cpp: [
+            'void mergeSort(std::vector<int>& marks, int l, int r) {',
+            '    if (l >= r) return;',
+            '    int m = l + (r - l) / 2;',
+            '    mergeSort(marks, l, m); mergeSort(marks, m + 1, r);',
+            '    std::vector<int> merged;',
+            '    int i = l, j = m + 1;',
+            '    while (i <= m && j <= r) merged.push_back(marks[i] <= marks[j] ? marks[i++] : marks[j++]);',
+            '    while (i <= m) merged.push_back(marks[i++]);',
+            '    while (j <= r) merged.push_back(marks[j++]);',
+            '    for (int k = 0; k < merged.size(); ++k) marks[l + k] = merged[k];',
+            '}'
+          ]
+        }
+      }
+    };
+
+    const SPEEDS = { 1: 750, 2: 450, 3: 200, 4: 80, 5: 25 };
+    const SPEED_LABELS = { 1: 'Slow (750ms)', 2: 'Relaxed (450ms)', 3: 'Medium (200ms)', 4: 'Fast (80ms)', 5: 'Turbo (25ms)' };
+
+    // State Variables
+    let currentAlgo = 'selection';
+    let currentLang = 'python';
+    let currentView = 'bars';
+    let sortDirection = 'asc'; // 'asc' or 'desc'
+    let arr = [];
+    let initialArr = [];
+    let steps = [];
+    let stepIdx = 0;
+    let isPlaying = false;
+    let animTimer = null;
+    let soundEnabled = true;
+
+    // Web Audio Synthesizer Context
+    let audioCtx = null;
+    function playBeep(val) {
+      if (!soundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        // Frequency mapped from 220Hz to 880Hz
+        const clampedVal = Math.max(0, Math.min(100, val || 50));
+        const freq = 220 + (clampedVal / 100) * 660;
+
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        osc.type = 'sine';
+
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.11);
+      } catch (e) {}
+    }
+
+    const $ = id => document.getElementById(id);
+    const vizStage = $('viz-stage');
+
+    function getGrade(mark) {
+      if (mark >= 90) return { letter: 'A+', class: 'grade-A' };
+      if (mark >= 75) return { letter: 'A', class: 'grade-A' };
+      if (mark >= 60) return { letter: 'B', class: 'grade-B' };
+      if (mark >= 45) return { letter: 'C', class: 'grade-C' };
+      return { letter: 'F', class: 'grade-F' };
+    }
+
+    function parseInput() {
+      const parts = $('numInput').value.split(',').map(s => s.trim()).filter(Boolean);
+      if (parts.length < 2 || parts.length > 25) return null;
+      const nums = parts.map(Number);
+      if (nums.some(n => isNaN(n) || n < 0 || n > 100)) return null;
+      return nums;
+    }
+
+    /* Rendering Code Lines */
+    function renderCode(algoKey, activeLineIndex = -1) {
+      const algo = ALGO_METADATA[algoKey];
+      const codeList = algo.code[currentLang] || algo.code.python;
+      const viewer = $('codeViewer');
+      viewer.innerHTML = '';
+
+      codeList.forEach((line, idx) => {
+        const div = document.createElement('span');
+        div.className = 'code-line' + (idx === activeLineIndex ? ' active' : '');
+        div.textContent = line;
+        viewer.appendChild(div);
+      });
+    }
+
+    /* Build Visualizer DOM */
+    function renderDOM(data, state = {}) {
+      vizStage.innerHTML = '';
+
+      if (currentView === 'bars') {
+        const maxVal = Math.max(...data, 100);
+        data.forEach((val, i) => {
+          const col = document.createElement('div');
+          col.className = 'bar-column';
+
+          const markVal = document.createElement('span');
+          markVal.className = 'bar-mark-val';
+          markVal.textContent = val;
+
+          const pillar = document.createElement('div');
+          pillar.className = 'bar-pillar';
+          const heightPct = Math.max(14, (val / maxVal) * 200);
+          pillar.style.height = `${heightPct}px`;
+
+          // Apply state color
+          if (state.sorted && state.sorted.includes(i)) {
+            pillar.style.background = 'var(--col-sorted)';
+            pillar.style.boxShadow = '0 0 10px rgba(16, 185, 129, 0.4)';
+          } else if (state.placing && state.placing.includes(i)) {
+            pillar.style.background = 'var(--col-swap)';
+            pillar.style.boxShadow = '0 0 10px rgba(192, 132, 252, 0.5)';
+          } else if (state.pivot === i) {
+            pillar.style.background = 'var(--col-pivot)';
+            pillar.style.boxShadow = '0 0 10px rgba(236, 72, 153, 0.5)';
+          } else if (state.minimum === i) {
+            pillar.style.background = 'var(--col-min)';
+            pillar.style.boxShadow = '0 0 10px rgba(239, 68, 68, 0.5)';
+          } else if (state.comparing && state.comparing.includes(i)) {
+            pillar.style.background = 'var(--col-compare)';
+            pillar.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.5)';
+          } else {
+            pillar.style.background = 'var(--col-unsorted)';
+          }
+
+          const idx = document.createElement('span');
+          idx.className = 'bar-idx';
+          idx.textContent = `[${i}]`;
+
+          col.appendChild(markVal);
+          col.appendChild(pillar);
+          col.appendChild(idx);
+          vizStage.appendChild(col);
+        });
+      } else {
+        // Student Cards View
+        const cardsWrap = document.createElement('div');
+        cardsWrap.className = 'cards-view-container';
+
+        data.forEach((val, i) => {
+          const card = document.createElement('div');
+          card.className = 'student-card';
+
+          if (state.sorted && state.sorted.includes(i)) {
+            card.style.borderColor = 'var(--col-sorted)';
+            card.style.boxShadow = '0 0 14px rgba(16, 185, 129, 0.35)';
+          } else if (state.placing && state.placing.includes(i)) {
+            card.style.borderColor = 'var(--col-swap)';
+            card.style.transform = 'scale(1.06)';
+            card.style.boxShadow = '0 0 14px rgba(192, 132, 252, 0.4)';
+          } else if (state.pivot === i) {
+            card.style.borderColor = 'var(--col-pivot)';
+            card.style.transform = 'scale(1.05)';
+            card.style.boxShadow = '0 0 14px rgba(236, 72, 153, 0.4)';
+          } else if (state.minimum === i) {
+            card.style.borderColor = 'var(--col-min)';
+            card.style.boxShadow = '0 0 12px rgba(239, 68, 68, 0.4)';
+          } else if (state.comparing && state.comparing.includes(i)) {
+            card.style.borderColor = 'var(--col-compare)';
+            card.style.boxShadow = '0 0 10px rgba(245, 158, 11, 0.3)';
+          }
+
+          const avatar = document.createElement('div');
+          avatar.className = 'student-avatar';
+          avatar.innerHTML = `<i class="fas fa-user-graduate"></i>`;
+
+          const mark = document.createElement('span');
+          mark.className = 'student-mark';
+          mark.textContent = val;
+
+          const gradeInfo = getGrade(val);
+          const badge = document.createElement('span');
+          badge.className = `student-grade-badge ${gradeInfo.class}`;
+          badge.textContent = `Grade ${gradeInfo.letter}`;
+
+          const roll = document.createElement('span');
+          roll.style.fontSize = '0.68rem';
+          roll.style.color = 'var(--dim)';
+          roll.textContent = `Roll #${i + 1}`;
+
+          card.appendChild(avatar);
+          card.appendChild(mark);
+          card.appendChild(badge);
+          card.appendChild(roll);
+          cardsWrap.appendChild(card);
+        });
+        vizStage.appendChild(cardsWrap);
+      }
+    }
+
+    /* ================= ALGORITHM STEP GENERATORS ================= */
+
+    function buildSelectionSteps(input, dir = 'asc') {
+      const a = [...input], n = a.length, out = [];
+      const sorted = new Set();
+      let comps = 0, sws = 0;
+
+      const snap = (extra) => out.push({
+        data: [...a],
+        sorted: [...sorted],
+        comparing: [],
+        minimum: null,
+        pivot: null,
+        placing: null,
+        comps,
+        swaps: sws,
+        line: 2,
+        ...extra
+      });
+
+      const dirLabel = dir === 'asc' ? 'Ascending (lowest first)' : 'Descending (rank order, highest first)';
+      snap({ msg: `Initialized Selection Sort in ${dirLabel} mode.`, line: 1, pass: 0 });
+
+      for (let i = 0; i < n - 1; i++) {
+        let targetIdx = i;
+        const targetType = dir === 'asc' ? 'min' : 'max';
+        snap({ comparing: [i], minimum: i, pass: i + 1, line: 3, msg: `Pass ${i + 1}: Scan starts at index [${i}]. Initial ${targetType} = ${a[i]}.` });
+
+        for (let j = i + 1; j < n; j++) {
+          comps++;
+          snap({ comparing: [j], minimum: targetIdx, pass: i + 1, line: 4, msg: `Comparing mark a[${j}]=${a[j]} with current ${targetType} a[${targetIdx}]=${a[targetIdx]}.` });
+
+          const shouldUpdate = dir === 'asc' ? a[j] < a[targetIdx] : a[j] > a[targetIdx];
+          if (shouldUpdate) {
+            targetIdx = j;
+            snap({ comparing: [j], minimum: targetIdx, pass: i + 1, line: 6, hl: true, msg: `Found ${dir === 'asc' ? 'lower' : 'higher'} mark: a[${targetIdx}]=${a[targetIdx]}. Updated target!` });
+          }
+        }
+
+        if (targetIdx !== i) {
+          sws++;
+          snap({ placing: [i, targetIdx], minimum: targetIdx, pass: i + 1, line: 7, hl: true, msg: `Swapping a[${i}]=${a[i]} with target mark a[${targetIdx}]=${a[targetIdx]}.` });
+          [a[i], a[targetIdx]] = [a[targetIdx], a[i]];
+        }
+        sorted.add(i);
+        snap({ pass: i + 1, line: 7, msg: `✔ Mark ${a[i]} locked into sorted position.` });
+      }
+      sorted.add(n - 1);
+      snap({ pass: n, line: 0, hl: true, msg: `🎉 Selection sort completed! All ${n} marks ordered.` });
+      return out;
+    }
+
+    function buildBubbleSteps(input, dir = 'asc') {
+      const a = [...input], n = a.length, out = [];
+      const sorted = new Set();
+      let comps = 0, sws = 0;
+
+      const snap = (extra) => out.push({
+        data: [...a],
+        sorted: [...sorted],
+        comparing: [],
+        minimum: null,
+        pivot: null,
+        placing: null,
+        comps,
+        swaps: sws,
+        line: 2,
+        ...extra
+      });
+
+      snap({ msg: `Initialized Bubble Sort (${dir === 'asc' ? 'Ascending' : 'Descending'}).`, line: 1, pass: 0 });
+
+      for (let i = 0; i < n; i++) {
+        let swappedAny = false;
+        for (let j = 0; j < n - i - 1; j++) {
+          comps++;
+          snap({ comparing: [j, j + 1], pass: i + 1, line: 3, msg: `Comparing adjacent marks a[${j}]=${a[j]} and a[${j + 1}]=${a[j + 1]}.` });
+
+          const shouldSwap = dir === 'asc' ? a[j] > a[j + 1] : a[j] < a[j + 1];
+          if (shouldSwap) {
+            sws++;
+            swappedAny = true;
+            [a[j], a[j + 1]] = [a[j + 1], a[j]];
+            snap({ placing: [j, j + 1], pass: i + 1, line: 5, hl: true, msg: `Swapped: moved mark ${a[j + 1]} forward.` });
+          }
+        }
+        sorted.add(n - i - 1);
+        snap({ pass: i + 1, line: 2, msg: `✔ Bubble pass ${i + 1} finalized position for mark a[${n - i - 1}]=${a[n - i - 1]}.` });
+        if (!swappedAny) break;
+      }
+      for (let k = 0; k < n; k++) sorted.add(k);
+      snap({ pass: n, line: 0, hl: true, msg: `🎉 Bubble sort completed cleanly.` });
+      return out;
+    }
+
+    function buildInsertionSteps(input, dir = 'asc') {
+      const a = [...input], n = a.length, out = [];
+      const sorted = new Set([0]);
+      let comps = 0, sws = 0;
+
+      const snap = (extra) => out.push({
+        data: [...a],
+        sorted: [...sorted],
+        comparing: [],
+        minimum: null,
+        pivot: null,
+        placing: null,
+        comps,
+        swaps: sws,
+        line: 1,
+        ...extra
+      });
+
+      snap({ msg: 'Initialized Insertion Sort with a[0] considered sorted.', line: 1, pass: 0 });
+
+      for (let i = 1; i < n; i++) {
+        let key = a[i];
+        let j = i - 1;
+        snap({ comparing: [i], minimum: i, pass: i, line: 2, msg: `Selected mark a[${i}]=${key} to insert into sorted left partition.` });
+
+        while (j >= 0 && (dir === 'asc' ? a[j] > key : a[j] < key)) {
+          comps++;
+          sws++;
+          a[j + 1] = a[j];
+          snap({ comparing: [j], placing: [j + 1], pass: i, line: 5, msg: `Shifted mark ${a[j]} to the right.` });
+          j--;
+        }
+        if (j >= 0) comps++;
+        a[j + 1] = key;
+        for (let k = 0; k <= i; k++) sorted.add(k);
+        snap({ placing: [j + 1], pass: i, line: 7, hl: true, msg: `Inserted mark ${key} into position [${j + 1}].` });
+      }
+      for (let k = 0; k < n; k++) sorted.add(k);
+      snap({ pass: n, line: 0, hl: true, msg: `🎉 Insertion sort completed successfully.` });
+      return out;
+    }
+
+    function buildQuickSteps(input, dir = 'asc') {
+      const a = [...input], n = a.length, out = [];
+      const sorted = new Set();
+      let comps = 0, sws = 0;
+
+      const snap = (extra) => out.push({
+        data: [...a],
+        sorted: [...sorted],
+        comparing: [],
+        minimum: null,
+        pivot: null,
+        placing: null,
+        comps,
+        swaps: sws,
+        line: 1,
+        ...extra
+      });
+
+      snap({ msg: 'Initialized Quick Sort with Divide & Conquer.', line: 1, pass: 0 });
+
+      function qs(low, high) {
+        if (low < high) {
+          let pivot = a[high];
+          snap({ pivot: high, pass: low, line: 6, msg: `Pivot chosen: a[${high}]=${pivot}. Partitioning range [${low}..${high}].` });
+          let i = low - 1;
+
+          for (let j = low; j < high; j++) {
+            comps++;
+            snap({ comparing: [j], pivot: high, pass: low, line: 9, msg: `Comparing mark a[${j}]=${a[j]} against pivot ${pivot}.` });
+
+            const shouldMove = dir === 'asc' ? a[j] < pivot : a[j] > pivot;
+            if (shouldMove) {
+              i++;
+              sws++;
+              [a[i], a[j]] = [a[j], a[i]];
+              snap({ placing: [i, j], pivot: high, pass: low, line: 10, hl: true, msg: `Moved mark ${a[i]} to partition.` });
+            }
+          }
+          sws++;
+          [a[i + 1], a[high]] = [a[high], a[i + 1]];
+          const pi = i + 1;
+          sorted.add(pi);
+          snap({ placing: [pi], pass: low, line: 11, hl: true, msg: `Pivot ${a[pi]} placed in its exact final index [${pi}].` });
+
+          qs(low, pi - 1);
+          qs(pi + 1, high);
+        } else if (low === high) {
+          sorted.add(low);
+          snap({ pass: low, line: 1, msg: `Single element at [${low}]=${a[low]} is in final position.` });
+        }
+      }
+
+      qs(0, n - 1);
+      for (let k = 0; k < n; k++) sorted.add(k);
+      snap({ pass: n, line: 0, hl: true, msg: `🎉 Quick sort partition tree fully resolved.` });
+      return out;
+    }
+
+    function buildMergeSteps(input, dir = 'asc') {
+      const a = [...input], n = a.length, out = [];
+      const sorted = new Set();
+      let comps = 0, sws = 0;
+
+      const snap = (extra) => out.push({
+        data: [...a],
+        sorted: [...sorted],
+        comparing: [],
+        minimum: null,
+        pivot: null,
+        placing: null,
+        comps,
+        swaps: sws,
+        line: 1,
+        ...extra
+      });
+
+      snap({ msg: 'Starting Divide & Conquer Merge Sort.', line: 1, pass: 0 });
+
+      for (let width = 1; width < n; width = 2 * width) {
+        for (let i = 0; i < n; i = i + 2 * width) {
+          let left = i;
+          let mid = Math.min(i + width, n);
+          let right = Math.min(i + 2 * width, n);
+
+          let p1 = left, p2 = mid;
+          let temp = [];
+
+          while (p1 < mid && p2 < right) {
+            comps++;
+            snap({ comparing: [p1, p2], pass: width, line: 6, msg: `Merging sub-arrays: comparing a[${p1}]=${a[p1]} and a[${p2}]=${a[p2]}.` });
+
+            const chooseP1 = dir === 'asc' ? a[p1] <= a[p2] : a[p1] >= a[p2];
+            if (chooseP1) {
+              temp.push(a[p1++]);
+            } else {
+              temp.push(a[p2++]);
+            }
+          }
+          while (p1 < mid) temp.push(a[p1++]);
+          while (p2 < right) temp.push(a[p2++]);
+
+          for (let k = 0; k < temp.length; k++) {
+            sws++;
+            a[left + k] = temp[k];
+            snap({ placing: [left + k], pass: width, line: 7, msg: `Writing merged mark ${temp[k]} into position [${left + k}].` });
+          }
+        }
+      }
+      for (let k = 0; k < n; k++) sorted.add(k);
+      snap({ pass: n, line: 0, hl: true, msg: `🎉 Merge sort completed all split-and-merge cycles.` });
+      return out;
+    }
+
+    function getStepsForAlgo(algo, data, dir) {
+      switch (algo) {
+        case 'bubble': return buildBubbleSteps(data, dir);
+        case 'insertion': return buildInsertionSteps(data, dir);
+        case 'quick': return buildQuickSteps(data, dir);
+        case 'merge': return buildMergeSteps(data, dir);
+        case 'selection':
+        default:
+          return buildSelectionSteps(data, dir);
+      }
+    }
+
+    /* Execution and Control Routines */
+    function addLogEntry(text, hl = false) {
+      const log = $('step-log');
+      const entry = document.createElement('div');
+      entry.className = 'log-entry' + (hl ? ' hl' : '');
+      entry.innerHTML = `<i class="fas fa-angle-right" style="color:var(--accent)"></i> ${text}`;
+      log.prepend(entry);
+    }
+
+    function updateProgressBar() {
+      const total = steps.length;
+      const current = stepIdx;
+      const pct = total > 0 ? Math.min(100, Math.round((current / total) * 100)) : 0;
+      $('progressBar').style.width = `${pct}%`;
+      $('stepCounter').textContent = `Step ${current} / ${total}`;
+    }
+
+    function renderCurrentStep(s) {
+      renderDOM(s.data, s);
+      renderCode(currentAlgo, s.line !== undefined ? s.line : -1);
+
+      $('statPass').textContent = s.pass !== undefined ? s.pass : '—';
+      $('statComps').textContent = s.comps;
+      $('statSwaps').textContent = s.swaps;
+
+      if (s.msg) addLogEntry(s.msg, s.hl);
+
+      // Play audio beep for comparisons or placements
+      if (s.comparing && s.comparing.length > 0) {
+        playBeep(s.data[s.comparing[0]]);
+      } else if (s.placing && s.placing.length > 0) {
+        playBeep(s.data[s.placing[0]]);
+      }
+
+      updateProgressBar();
+
+      const isDone = stepIdx >= steps.length;
+      $('statStatus').textContent = isDone ? 'Done! ✅' : isPlaying ? 'Sorting…' : 'Step-by-Step';
+    }
+
+    function runAnimation() {
+      if (stepIdx >= steps.length) {
+        isPlaying = false;
+        $('btnPlay').innerHTML = '<i class="fas fa-rotate-left"></i> Replay';
+        $('statStatus').textContent = 'Done! ✅';
+        updateProgressBar();
+        return;
+      }
+      renderCurrentStep(steps[stepIdx++]);
+      const speedDelay = SPEEDS[+$('speedSlider').value] || 200;
+      animTimer = setTimeout(runAnimation, speedDelay);
+    }
+
+    function resetSimulation(newData) {
+      clearTimeout(animTimer);
+      isPlaying = false;
+      $('btnPlay').innerHTML = '<i class="fas fa-play"></i> Play';
+      if (newData) {
+        initialArr = [...newData];
+        arr = [...newData];
+      } else {
+        arr = [...initialArr];
+      }
+      steps = [];
+      stepIdx = 0;
+      renderDOM(arr, {});
+      renderCode(currentAlgo, -1);
+      $('statPass').textContent = '—';
+      $('statComps').textContent = '0';
+      $('statSwaps').textContent = '0';
+      $('statStatus').textContent = 'Ready';
+      updateProgressBar();
+      $('step-log').innerHTML = `<div class="log-entry">Array reset. Ready to run ${ALGO_METADATA[currentAlgo].name} (${sortDirection === 'asc' ? 'Ascending' : 'Descending'}).</div>`;
+    }
+
+    /* Event Listeners */
+    $('btnPlay').addEventListener('click', () => {
+      $('error-msg').textContent = '';
+
+      if (isPlaying) {
+        clearTimeout(animTimer);
+        isPlaying = false;
+        $('btnPlay').innerHTML = '<i class="fas fa-play"></i> Resume';
+        $('statStatus').textContent = 'Paused ⏸';
+        return;
+      }
+
+      const nums = parseInput();
+      if (!nums) {
+        $('error-msg').textContent = 'Please enter between 2 and 25 valid marks (numbers from 0 to 100).';
+        return;
+      }
+
+      // If finished, or first run, or input changed, re-generate from the initial array!
+      if (stepIdx >= steps.length || steps.length === 0 || JSON.stringify(initialArr) !== JSON.stringify(nums)) {
+        initialArr = [...nums];
+        arr = [...nums];
+        steps = getStepsForAlgo(currentAlgo, arr, sortDirection);
+        stepIdx = 0;
+      }
+
+      isPlaying = true;
+      $('btnPlay').innerHTML = '<i class="fas fa-pause"></i> Pause';
+      $('statStatus').textContent = 'Sorting…';
+      runAnimation();
+    });
+
+    $('btnStep').addEventListener('click', () => {
+      $('error-msg').textContent = '';
+
+      if (isPlaying) {
+        clearTimeout(animTimer);
+        isPlaying = false;
+        $('btnPlay').innerHTML = '<i class="fas fa-play"></i> Resume';
+      }
+
+      const nums = parseInput();
+      if (!nums) {
+        $('error-msg').textContent = 'Please enter valid numbers between 0 and 100.';
+        return;
+      }
+
+      if (stepIdx >= steps.length || steps.length === 0 || JSON.stringify(initialArr) !== JSON.stringify(nums)) {
+        initialArr = [...nums];
+        arr = [...nums];
+        steps = getStepsForAlgo(currentAlgo, arr, sortDirection);
+        stepIdx = 0;
+      }
+
+      if (stepIdx < steps.length) {
+        renderCurrentStep(steps[stepIdx++]);
+      } else {
+        $('statStatus').textContent = 'Done! ✅';
+      }
+    });
+
+    $('btnReset').addEventListener('click', () => {
+      const nums = parseInput();
+      if (nums) resetSimulation(nums);
+    });
+
+    // Ascending / Descending Toggle
+    $('btnToggleDir').addEventListener('click', () => {
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+      const isAsc = sortDirection === 'asc';
+      $('btnToggleDir').innerHTML = isAsc
+        ? '<i class="fas fa-arrow-down-short-wide"></i> <span>Ascending (0 → 100)</span>'
+        : '<i class="fas fa-arrow-up-wide-short"></i> <span>Descending (100 → 0)</span>';
+
+      const nums = parseInput() || arr;
+      resetSimulation(nums);
+    });
+
+    // Preset buttons
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const type = btn.dataset.preset;
+        let set = [];
+        if (type === 'marks') {
+          set = [85, 42, 91, 67, 54, 78, 99, 33, 88, 62];
+        } else if (type === 'random') {
+          set = Array.from({ length: 10 }, () => Math.floor(Math.random() * 85) + 15);
+        } else if (type === 'nearly') {
+          set = [25, 38, 45, 52, 60, 58, 74, 82, 80, 95];
+        } else if (type === 'reverse') {
+          set = [98, 89, 76, 68, 55, 48, 37, 24, 18, 10];
+        }
+        $('numInput').value = set.join(', ');
+        $('error-msg').textContent = '';
+        resetSimulation(set);
+      });
+    });
+
+    // Algo Tab Switcher
+    $('algoTabs').addEventListener('click', (e) => {
+      const tab = e.target.closest('.algo-tab');
+      if (!tab) return;
+      document.querySelectorAll('.algo-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      currentAlgo = tab.dataset.algo;
+
+      const meta = ALGO_METADATA[currentAlgo];
+      $('timeComplexity').textContent = meta.time;
+      $('spaceComplexity').textContent = meta.space;
+      $('stabilityTag').textContent = meta.stability;
+
+      const nums = parseInput() || arr;
+      resetSimulation(nums);
+    });
+
+    // Code Language Switcher
+    $('langTabs').addEventListener('click', (e) => {
+      const btn = e.target.closest('.lang-btn');
+      if (!btn) return;
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLang = btn.dataset.lang;
+      renderCode(currentAlgo, stepIdx > 0 && steps[stepIdx - 1] ? steps[stepIdx - 1].line : -1);
+    });
+
+    // View toggle (Bars vs Cards)
+    $('viewBarsBtn').addEventListener('click', () => {
+      currentView = 'bars';
+      $('viewBarsBtn').classList.add('active');
+      $('viewCardsBtn').classList.remove('active');
+      renderDOM(arr, stepIdx > 0 && steps[stepIdx - 1] ? steps[stepIdx - 1] : {});
+    });
+    $('viewCardsBtn').addEventListener('click', () => {
+      currentView = 'cards';
+      $('viewCardsBtn').classList.add('active');
+      $('viewBarsBtn').classList.remove('active');
+      renderDOM(arr, stepIdx > 0 && steps[stepIdx - 1] ? steps[stepIdx - 1] : {});
+    });
+
+    // Sound toggle
+    $('soundToggle').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      $('soundToggle').classList.toggle('active', soundEnabled);
+      $('soundToggle').querySelector('span').textContent = soundEnabled ? 'Audio: ON' : 'Audio: OFF';
+      $('soundToggle').querySelector('i').className = soundEnabled ? 'fas fa-volume-high' : 'fas fa-volume-xmark';
+    });
+
+    // Speed slider
+    $('speedSlider').addEventListener('input', () => {
+      $('speedLabel').textContent = SPEED_LABELS[+$('speedSlider').value];
+    });
+
+    // Copy marks button
+    $('copyMarksBtn').addEventListener('click', () => {
+      const textToCopy = arr.join(', ');
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        const span = $('copyMarksBtn').querySelector('span');
+        const orig = span.textContent;
+        span.textContent = 'Copied!';
+        setTimeout(() => { span.textContent = orig; }, 1800);
+      });
+    });
+
+    // Initialize
+    const initialNums = parseInput();
+    if (initialNums) {
+      initialArr = [...initialNums];
+      arr = [...initialNums];
+      resetSimulation(arr);
+    }
+  </script>
+</body>
+</html>
