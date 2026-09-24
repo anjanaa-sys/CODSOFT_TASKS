@@ -27,7 +27,7 @@ anjana-portfolio/
 ## 🚀 Key Highlights Across All Applications
 
 ### 1. Flagship Portfolio (`index.html`, `style.css`, `script.js`)
-- **Verified Academic Data**: Highlights Anjana R.'s 2nd-year B.Tech journey at MVJ College of Engineering with an outstanding **9.10 CGPA**, Pre-University (**85%**), and Class X (**95.05%**).
+- **Verified Academic Data**: Highlights Anjana R.'s 2nd-year B.Tech journey at MVJ College of Engineering with an outstanding **9.10 SGPA**, Pre-University (**85%**), and Class X (**95.05%**).
 - **Visual Design**: Deep obsidian background (`#070a13`), luminous cyan/indigo aurora gradients, frosted glass panels (`backdrop-filter: blur(18px)`), and modern typography with `Space Grotesk`, `Inter`, and `Fira Code`.
 - **Interactive Neural Synapse Canvas**: Procedural floating nodes connected by glowing synapses that dynamically respond to mouse proximity.
 - **Dynamic Typewriter Subtitle**: Real-time role cycling with authentic blinking terminal cursor.
@@ -92,3 +92,4 @@ Endpoints:
 - Mark Sorter Pro: `http://localhost:3000/mark-sorter.html`
 - Skyline Weather: `http://localhost:3000/skyline.html`
 - Resume Document: `http://localhost:3000/Anjana_R_Resume.docx`
+
