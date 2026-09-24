@@ -142,7 +142,7 @@ const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <w:r><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="0284C7"/></w:rPr><w:t>PROFILE SUMMARY</w:t></w:r>
     </w:p>
     <w:p>
-      <w:r><w:rPr><w:sz w:val="22"/></w:rPr><w:t>Motivated and detail-oriented second-year B.Tech student in Artificial Intelligence and Machine Learning at MVJ College of Engineering with an exceptional 9.10 CGPA. Strong academic foundation in programming, data structures, operating systems, and object-oriented design. Enthusiastic learner seeking opportunities to gain practical exposure, contribute to real-world technical projects, and develop industry-grade software solutions.</w:t></w:r>
+      <w:r><w:rPr><w:sz w:val="22"/></w:rPr><w:t>Motivated and detail-oriented second-year B.Tech student in Artificial Intelligence and Machine Learning at MVJ College of Engineering with an exceptional 9.10 SGPA. Strong academic foundation in programming, data structures, operating systems, and object-oriented design. Enthusiastic learner seeking opportunities to gain practical exposure, contribute to real-world technical projects, and develop industry-grade software solutions.</w:t></w:r>
     </w:p>
     <w:p><w:r><w:t></w:t></w:r></w:p>
 
@@ -157,7 +157,7 @@ const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
       <w:r><w:rPr><w:sz w:val="22"/></w:rPr><w:t>MVJ College of Engineering, ITPL Main Road, Channasandra, Whitefield, Bangalore</w:t></w:r>
     </w:p>
     <w:p>
-      <w:r><w:rPr><w:b/><w:sz w:val="22"/><w:color w:val="16A34A"/></w:rPr><w:t>Current CGPA: 9.10 (2nd Year)</w:t></w:r>
+      <w:r><w:rPr><w:b/><w:sz w:val="22"/><w:color w:val="16A34A"/></w:rPr><w:t>Current SGPA: 9.10 (2nd Year)</w:t></w:r>
     </w:p>
     <w:p><w:r><w:t></w:t></w:r></w:p>
 
@@ -170,7 +170,7 @@ const documentXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <w:p><w:r><w:t></w:t></w:r></w:p>
 
     <w:p>
-      <w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>Secondary School / Class X (2020 — 2022)</w:t></w:r>
+      <w:r><w:rPr><w:b/><w:sz w:val="24"/></w:rPr><w:t>Secondary School / Class X (2021 — 2022)</w:t></w:r>
     </w:p>
     <w:p>
       <w:r><w:rPr><w:sz w:val="22"/></w:rPr><w:t>St. Joseph Convent High School | Aggregate: 95.05%</w:t></w:r>
